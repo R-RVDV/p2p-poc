@@ -1,0 +1,364 @@
+@prefix oced:  <https://w3id.org/ocedo/core#> .
+@prefix ext:   <http://emixa.nl/p2p/domain#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+
+# =============================================================
+# OCEDD - Domain-Specific Extension: Emixa P2P Process
+# Based on SAP tables: EBAN, EKKO, EKPO, MKPF, MSEG,
+#                      RBKP, RSEG, BKPF, BSEG, EKBE,
+#                      EKET, RKPF, RESB, CDHDR, CDPOS
+#
+# Convention used in this file:
+#   rdfs:label      — human-readable English name (for LLM and thesis)
+#   skos:altLabel   — SAP technical field name(s)
+#   rdfs:comment    — plain-English description of business meaning
+#   skos:scopeNote  — conformance scope clarification
+#
+# -------------------------------------------------------------
+# 1. OBJECT TYPES
+# -------------------------------------------------------------
+
+ext:P2PObject a owl:Class ;
+    rdfs:subClassOf oced:Object ;
+    rdfs:label "Purchase-to-Pay Object" ;
+    rdfs:comment "Superclass for all business objects in the Emixa Purchase-to-Pay process." .
+
+ext:PurchaseRequisition a owl:Class ;
+    rdfs:subClassOf ext:P2PObject ;
+    rdfs:label "Purchase Requisition" ;
+    skos:altLabel "EBAN" ;
+    rdfs:comment "An internal request to purchase goods or services. Created by a requester before a formal Purchase Order is placed. Identified by BANFN (requisition number) in SAP." .
+
+ext:PurchaseOrder a owl:Class ;
+    rdfs:subClassOf ext:P2PObject ;
+    rdfs:label "Purchase Order" ;
+    skos:altLabel "EKKO / EKPO" ;
+    rdfs:comment "A formal document sent to a vendor to purchase goods or services. The header (EKKO) contains general order data; the line items (EKPO) contain material and price details. Identified by EBELN (purchase order number) in SAP." .
+
+ext:GoodsReceipt a owl:Class ;
+    rdfs:subClassOf ext:P2PObject ;
+    rdfs:label "Goods Receipt" ;
+    skos:altLabel "MKPF / MSEG" ;
+    rdfs:comment "A confirmation that ordered goods have physically arrived at the warehouse. The header (MKPF) records the posting date; the line items (MSEG) link each delivery to a specific Purchase Order line. Identified by MBLNR (material document number) in SAP." .
+
+ext:Invoice a owl:Class ;
+    rdfs:subClassOf ext:P2PObject ;
+    rdfs:label "Vendor Invoice" ;
+    skos:altLabel "RBKP / RSEG" ;
+    rdfs:comment "A bill received from a vendor requesting payment for delivered goods or services. The header (RBKP) contains invoice date and vendor; the line items (RSEG) link the invoice to the corresponding Purchase Order lines. Identified by BELNR (document number) in SAP." .
+
+ext:FinancialDocument a owl:Class ;
+    rdfs:subClassOf ext:P2PObject ;
+    rdfs:label "Financial Accounting Document" ;
+    skos:altLabel "BKPF / BSEG" ;
+    rdfs:comment "An accounting document created when an invoice is cleared (paid). The header (BKPF) records the posting date and transaction code; the line items (BSEG) contain the general ledger account postings. Identified by the combination of BUKRS (company code), GJAHR (fiscal year) and BELNR (document number) in SAP." .
+
+
+ext:Reservation a owl:Class ;
+    rdfs:subClassOf ext:P2PObject ;
+    rdfs:label "Material Reservation" ;
+    skos:altLabel "RKPF / RESB" ;
+    rdfs:comment "A reservation of materials for a specific purpose, such as a project or production order. The header (RKPF) records the reservation; the items (RESB) link reserved materials to a Purchase Order. Identified by RSNUM (reservation number) in SAP." ;
+    skos:scopeNote "Included for knowledge graph completeness (RKPF/RESB). Outside the scope of OCBC conformance checking: not modelled as an entity in the OCBC ClaM." .
+
+
+# -------------------------------------------------------------
+# 2. EVENT TYPES
+# -------------------------------------------------------------
+
+ext:P2PEvent a owl:Class ;
+    rdfs:subClassOf oced:Event ;
+    rdfs:label "Purchase-to-Pay Event" ;
+    rdfs:comment "Superclass for all process events in the Emixa Purchase-to-Pay process." .
+
+ext:CreateRequisition a owl:Class ;
+    rdfs:subClassOf ext:P2PEvent ;
+    rdfs:label "Create Purchase Requisition" ;
+    skos:altLabel "EBAN.ERDAT" ;
+    rdfs:comment "The act of creating a purchase requisition in SAP. Marks the start of the procurement process. Timestamp derived from ERDAT (creation date) in EBAN." .
+
+ext:CreatePurchaseOrder a owl:Class ;
+    rdfs:subClassOf ext:P2PEvent ;
+    rdfs:label "Create Purchase Order" ;
+    skos:altLabel "EKKO.BEDAT" ;
+    rdfs:comment "The act of creating a formal purchase order and sending it to the vendor. Timestamp derived from BEDAT (document date) in EKKO." .
+
+ext:RecordGoodsReceipt a owl:Class ;
+    rdfs:subClassOf ext:P2PEvent ;
+    rdfs:label "Record Goods Receipt" ;
+    skos:altLabel "MKPF.BUDAT / T-code: MIGO" ;
+    rdfs:comment "The act of registering the physical arrival of goods in the warehouse. This step is required for the Three-Way Match. Timestamp derived from BUDAT (posting date) in MKPF." .
+
+ext:RecordInvoice a owl:Class ;
+    rdfs:subClassOf ext:P2PEvent ;
+    rdfs:label "Record Vendor Invoice" ;
+    skos:altLabel "RBKP.BLDAT / T-code: MIRO" ;
+    rdfs:comment "The act of entering a vendor invoice into the system for verification. Timestamp derived from BLDAT (invoice date) in RBKP." .
+
+ext:ClearInvoice a owl:Class ;
+    rdfs:subClassOf ext:P2PEvent ;
+    rdfs:label "Clear Invoice (Payment)" ;
+    skos:altLabel "BKPF.BUDAT / T-code: F-44 / F110" ;
+    rdfs:comment "The act of clearing an approved invoice, resulting in a payment to the vendor and the creation of a Financial Accounting Document. Timestamp derived from BUDAT (posting date) in BKPF." .
+
+
+ext:ChangeEvent a owl:Class ;
+    rdfs:subClassOf ext:P2PEvent ;
+    rdfs:label "Change Document Event" ;
+    skos:altLabel "CDHDR / CDPOS" ;
+    rdfs:comment "An event representing a field-level change to an existing SAP document. Derived from CDHDR (change header) and CDPOS (change position). The timestamp is derived from UDATE/UTIME in CDHDR; the actor from USERNAME in CDHDR." ;
+    skos:scopeNote "Auxiliary event type for root cause analysis only. Not modelled as a BCM activity in the OCBC. Used to investigate why a violation occurred (e.g. a price change after invoice posting)." .
+
+
+# -------------------------------------------------------------
+# 2.5 ACTIVITY-OBJECT TYPE RESTRICTIONS
+#
+#
+# Mapping to OCBC diagram (green dashed lines):
+#   CreateRequisition  --creates-->  PurchaseRequisition
+#   CreatePurchaseOrder --creates--> PurchaseOrder
+#   RecordGoodsReceipt --creates-->  GoodsReceipt
+#   RecordInvoice      --records-->  Invoice
+#   ClearInvoice       --clears-->   FinancialDocument
+#   ChangeEvent        --observes--> PurchaseOrder (auxiliary)
+# -------------------------------------------------------------
+
+ext:CreateRequisition rdfs:subClassOf
+    [ a owl:Restriction ;
+      owl:onProperty oced:observes ;
+      owl:allValuesFrom ext:PurchaseRequisition ] .
+
+ext:CreatePurchaseOrder rdfs:subClassOf
+    [ a owl:Restriction ;
+      owl:onProperty oced:observes ;
+      owl:allValuesFrom ext:PurchaseOrder ] .
+
+ext:RecordGoodsReceipt rdfs:subClassOf
+    [ a owl:Restriction ;
+      owl:onProperty oced:observes ;
+      owl:allValuesFrom ext:GoodsReceipt ] .
+
+ext:RecordInvoice rdfs:subClassOf
+    [ a owl:Restriction ;
+      owl:onProperty oced:observes ;
+      owl:allValuesFrom ext:Invoice ] .
+
+ext:ClearInvoice rdfs:subClassOf
+    [ a owl:Restriction ;
+      owl:onProperty oced:observes ;
+      owl:allValuesFrom ext:FinancialDocument ] .
+
+# ChangeEvent is auxiliary (root cause analysis only, outside
+# OCBC BCM scope). It observes a PurchaseOrder when derived
+# from CDHDR records with OBJECTCLAS = 'EINKBELEG'.
+ext:ChangeEvent rdfs:subClassOf
+    [ a owl:Restriction ;
+      owl:onProperty oced:observes ;
+      owl:allValuesFrom ext:PurchaseOrder ] .
+
+
+# -------------------------------------------------------------
+# 3. OBJECT-TO-OBJECT RELATIONS
+# -------------------------------------------------------------
+
+ext:isConvertedTo a owl:ObjectProperty ;
+    rdfs:subPropertyOf oced:object_relation ;
+    rdfs:label "is converted to" ;
+    skos:altLabel "EBAN.EBELN" ;
+    rdfs:domain ext:PurchaseRequisition ;
+    rdfs:range ext:PurchaseOrder ;
+    rdfs:comment "A Purchase Requisition has been approved and converted into a formal Purchase Order. Linked via the EBELN field in EBAN." .
+
+ext:isDeliveredBy a owl:ObjectProperty ;
+    rdfs:subPropertyOf oced:object_relation ;
+    rdfs:label "is delivered by" ;
+    skos:altLabel "MSEG.EBELN" ;
+    rdfs:domain ext:PurchaseOrder ;
+    rdfs:range ext:GoodsReceipt ;
+    rdfs:comment "A Purchase Order has been (partially) fulfilled through a Goods Receipt. Linked via the EBELN field in MSEG." .
+
+ext:matches a owl:ObjectProperty ;
+    rdfs:subPropertyOf oced:object_relation ;
+    rdfs:label "matches (Three-Way Match)" ;
+    skos:altLabel "RSEG.EBELN / MSEG.EBELN" ;
+    rdfs:domain ext:Invoice ;
+    rdfs:range ext:GoodsReceipt ;
+    rdfs:comment "An Invoice is matched to a Goods Receipt as part of the Three-Way Match verification (Purchase Order, Goods Receipt, Invoice must all align). Direction: Invoice → GoodsReceipt. Derived indirectly via the shared Purchase Order: all GoodsReceipt documents linked to the same EBELN as the invoice line (RSEG.EBELN = MSEG.EBELN). LFBNR was not available in the extraction." .
+
+ext:isBilledBy a owl:ObjectProperty ;
+    rdfs:subPropertyOf oced:object_relation ;
+    rdfs:label "is billed by" ;
+    skos:altLabel "RSEG.EBELN" ;
+    rdfs:domain ext:PurchaseOrder ;
+    rdfs:range ext:Invoice ;
+    rdfs:comment "A Purchase Order has been invoiced by the vendor. Linked via EBELN in RSEG." .
+
+ext:generatesFinancialDoc a owl:ObjectProperty ;
+    rdfs:subPropertyOf oced:object_relation ;
+    rdfs:label "generates financial document" ;
+    skos:altLabel "BKPF.AWKEY (first 10 chars)" ;
+    rdfs:domain ext:Invoice ;
+    rdfs:range ext:FinancialDocument ;
+    rdfs:comment "Clearing an invoice generates a Financial Accounting Document. Linked via the first 10 characters of AWKEY in BKPF, which reference the originating invoice document number." .
+
+ext:reservedFor a owl:ObjectProperty ;
+    rdfs:subPropertyOf oced:object_relation ;
+    rdfs:label "is reserved for" ;
+    skos:altLabel "RESB.EBELN" ;
+    rdfs:domain ext:Reservation ;
+    rdfs:range ext:PurchaseOrder ;
+    rdfs:comment "A Material Reservation is linked to a Purchase Order, indicating that specific materials are set aside for this order. Linked via EBELN in RESB." ;
+    skos:scopeNote "Included for knowledge graph completeness (RESB). Outside the scope of OCBC conformance checking: not modelled as a relation in the OCBC ClaM." .
+
+
+# -------------------------------------------------------------
+# 3.5 OBJECT-TO-OBJECT TYPE RESTRICTIONS
+#
+# Mapping to OCBC ClaM diagram (object-to-object relations):
+#   PurchaseRequisition --isConvertedTo-->    PurchaseOrder
+#   PurchaseOrder       --isDeliveredBy-->    GoodsReceipt
+#   PurchaseOrder       --isBilledBy-->       Invoice
+#   Invoice             --matches-->          GoodsReceipt
+#   Invoice             --generates-->        FinancialDocument
+#   Reservation         --reservedFor-->      PurchaseOrder (KG only)
+# -------------------------------------------------------------
+
+ext:PurchaseRequisition rdfs:subClassOf
+    [ a owl:Restriction ;
+      owl:onProperty ext:isConvertedTo ;
+      owl:allValuesFrom ext:PurchaseOrder ] .
+
+ext:PurchaseOrder rdfs:subClassOf
+    [ a owl:Restriction ;
+      owl:onProperty ext:isDeliveredBy ;
+      owl:allValuesFrom ext:GoodsReceipt ] .
+
+ext:PurchaseOrder rdfs:subClassOf
+    [ a owl:Restriction ;
+      owl:onProperty ext:isBilledBy ;
+      owl:allValuesFrom ext:Invoice ] .
+
+ext:Invoice rdfs:subClassOf
+    [ a owl:Restriction ;
+      owl:onProperty ext:matches ;
+      owl:allValuesFrom ext:GoodsReceipt ] .
+
+ext:Invoice rdfs:subClassOf
+    [ a owl:Restriction ;
+      owl:onProperty ext:generatesFinancialDoc ;
+      owl:allValuesFrom ext:FinancialDocument ] .
+
+ext:Reservation rdfs:subClassOf
+    [ a owl:Restriction ;
+      owl:onProperty ext:reservedFor ;
+      owl:allValuesFrom ext:PurchaseOrder ] .
+
+
+# -------------------------------------------------------------
+# 4. ATTRIBUTES
+# -------------------------------------------------------------
+
+
+ext:userName a owl:DatatypeProperty ;
+    rdfs:subPropertyOf oced:event_attribute ;
+    rdfs:label "Executed By (User Name)" ;
+    skos:altLabel "USNAM / ERNAM / AFNAM / USERNAME" ;
+    rdfs:domain ext:P2PEvent ;
+    rdfs:range xsd:string ;
+    rdfs:comment "The SAP username of the person who executed this process step. Used for Segregation of Duties checks: the same user must not create both the Purchase Order and approve the Invoice. Present in EKKO (USNAM), MKPF (USNAM), RBKP (USNAM), BKPF (USNAM), and CDHDR (USERNAME)." .
+
+ext:vendorId a owl:DatatypeProperty ;
+    rdfs:subPropertyOf oced:object_attribute ;
+    rdfs:label "Vendor Identifier" ;
+    skos:altLabel "LIFNR" ;
+    rdfs:domain ext:P2PObject ;
+    rdfs:range xsd:string ;
+    rdfs:comment "The unique identifier of the vendor in SAP. On a Purchase Order (EKKO.LIFNR) it identifies the contracted vendor; on a Vendor Invoice (RBKP.LIFNR) it identifies the billing vendor. Comparing these values is the vendor check of the Three-Way Match." .
+
+# --- Three-Way Match ---
+
+ext:netAmount a owl:DatatypeProperty ;
+    rdfs:subPropertyOf oced:object_attribute ;
+    rdfs:label "Net Amount" ;
+    skos:altLabel "NETWR (EKPO) / WRBTR (RSEG)" ;
+    rdfs:domain ext:P2PObject ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment "The net monetary value of this object. On a Purchase Order (EKPO.NETWR) it represents the agreed price; on an Invoice (RSEG.WRBTR) it represents the billed amount. Comparing these values is the price check of the Three-Way Match." .
+
+ext:quantity a owl:DatatypeProperty ;
+    rdfs:subPropertyOf oced:object_attribute ;
+    rdfs:label "Quantity" ;
+    skos:altLabel "MENGE (EKPO / MSEG / RSEG)" ;
+    rdfs:domain ext:P2PObject ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment "The number of units of a material. On a Purchase Order (EKPO.MENGE) it is the ordered quantity; on a Goods Receipt (MSEG.MENGE) it is the delivered quantity. Comparing these values is the quantity check of the Three-Way Match." .
+
+# --- Process Context ---
+
+ext:transactionCode a owl:DatatypeProperty ;
+    rdfs:subPropertyOf oced:event_attribute ;
+    rdfs:label "SAP Transaction Code" ;
+    skos:altLabel "TCODE" ;
+    rdfs:domain ext:P2PEvent ;
+    rdfs:range xsd:string ;
+    rdfs:comment "The SAP transaction code used to execute this step (e.g. ME21N = create PO, MIGO = post goods receipt, MIRO = enter invoice, F110 = automatic payment). Indicates whether the action was performed manually or via an automated batch process." .
+
+# --- Detail Context ---
+
+ext:materialNumber a owl:DatatypeProperty ;
+    rdfs:subPropertyOf oced:object_attribute ;
+    rdfs:label "Material or Service Description" ;
+    skos:altLabel "MATNR / TXZ01 (EKPO)" ;
+    rdfs:range xsd:string ;
+    rdfs:domain ext:PurchaseOrder ;
+    rdfs:comment "The material number (MATNR) or short text description (TXZ01) of the item being purchased. Used to identify what was ordered and verify it matches what was delivered." .
+
+# --- Delivery Scheduling (EKET) ---
+
+ext:scheduledDeliveryDate a owl:DatatypeProperty ;
+    rdfs:subPropertyOf oced:object_attribute ;
+    rdfs:label "Scheduled Delivery Date" ;
+    skos:altLabel "EINDT (EKET)" ;
+    rdfs:domain ext:PurchaseOrder ;
+    rdfs:range xsd:date ;
+    rdfs:comment "The date on which the vendor is expected to deliver the goods, as agreed in the delivery schedule. Derived from EINDT in EKET. Used to check whether a Goods Receipt arrived on time." .
+
+# --- PO History (EKBE) ---
+
+ext:poHistoryAmount a owl:DatatypeProperty ;
+    rdfs:subPropertyOf oced:event_attribute ;
+    rdfs:label "PO History Transaction Amount" ;
+    skos:altLabel "WRBTR (EKBE)" ;
+    rdfs:domain ext:P2PEvent ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment "The monetary amount recorded in the Purchase Order history for a specific transaction (Goods Receipt or Invoice Posting). Derived from WRBTR in EKBE. Useful for tracking cumulative invoiced and received amounts against the PO value." .
+
+# --- Root Cause Analysis (CDHDR / CDPOS) ---
+
+ext:changedFieldName a owl:DatatypeProperty ;
+    rdfs:subPropertyOf oced:event_attribute ;
+    rdfs:label "Changed Field Name" ;
+    skos:altLabel "FNAME (CDPOS)" ;
+    rdfs:domain ext:ChangeEvent ;
+    rdfs:range xsd:string ;
+    rdfs:comment "The technical name of the SAP field that was modified in a change event (e.g. NETWR = net value, MENGE = quantity, LIFNR = vendor). Used for root cause analysis when a violation is detected." .
+
+ext:oldValue a owl:DatatypeProperty ;
+    rdfs:subPropertyOf oced:event_attribute ;
+    rdfs:label "Previous Field Value" ;
+    skos:altLabel "VALUE_OLD (CDPOS)" ;
+    rdfs:domain ext:ChangeEvent ;
+    rdfs:range xsd:string ;
+    rdfs:comment "The value of a SAP field before it was changed. Combined with ext:newValue, this shows what was altered and by whom. Used for root cause analysis of compliance violations." .
+
+ext:newValue a owl:DatatypeProperty ;
+    rdfs:subPropertyOf oced:event_attribute ;
+    rdfs:label "New Field Value" ;
+    skos:altLabel "VALUE_NEW (CDPOS)" ;
+    rdfs:domain ext:ChangeEvent ;
+    rdfs:range xsd:string ;
+    rdfs:comment "The value of a SAP field after it was changed. Combined with ext:oldValue, this shows what was altered. A price change after invoice receipt (NETWR in CDPOS) is a key indicator of a potential Three-Way Match manipulation." .
