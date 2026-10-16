@@ -1,7 +1,6 @@
 # Knowledge-Aware Conformance Checking: Proof-of-Concept
 
-Proof-of-concept tool of the master thesis *Knowledge-Aware Conformance Checking: Leveraging
-Object-Centric Event Data (OCED) for Process Diagnosis in SAP Environments* (Utrecht University,
+Proof-of-concept tool of the master thesis *Knowledge-Aware Conformance Checking: Integrating Object-Centric Event Data and Behavioral Constraints for Process Diagnosis in SAP* (Utrecht University,
 2026, in cooperation with Emixa).
 
 The tool lets you explore the Knowledge Graph of a Purchase-to-Pay process, run OCBC conformance
