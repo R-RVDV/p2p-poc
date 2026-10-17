@@ -19141,28 +19141,28 @@ res:Ev_ClearInv_1000_2020_5100000003 a ext:ClearInvoice,
 res:Ev_ClearInv_1000_2020_5100000004 a ext:ClearInvoice,
         oced:Event ;
     ext:transactionCode "MIRO"^^xsd:string ;
-    ext:userName "User_INJ_S3_105"^^xsd:string ;
+    ext:userName "User_INJ_S2_105"^^xsd:string ;
     oced:observed_at "2020-01-27"^^xsd:date ;
     oced:observes res:FI_1000_2020_5100000004 .
 
 res:Ev_ClearInv_1000_2020_5100000005 a ext:ClearInvoice,
         oced:Event ;
     ext:transactionCode "MR8M"^^xsd:string ;
-    ext:userName "User_INJ_S3_106"^^xsd:string ;
+    ext:userName "User_INJ_S2_106"^^xsd:string ;
     oced:observed_at "2020-01-27"^^xsd:date ;
     oced:observes res:FI_1000_2020_5100000005 .
 
 res:Ev_ClearInv_1000_2020_5100000006 a ext:ClearInvoice,
         oced:Event ;
     ext:transactionCode "MIRO"^^xsd:string ;
-    ext:userName "User_INJ_S3_107"^^xsd:string ;
+    ext:userName "User_INJ_S2_107"^^xsd:string ;
     oced:observed_at "2020-01-27"^^xsd:date ;
     oced:observes res:FI_1000_2020_5100000006 .
 
 res:Ev_ClearInv_1000_2020_5100000007 a ext:ClearInvoice,
         oced:Event ;
     ext:transactionCode "MR8M"^^xsd:string ;
-    ext:userName "User_INJ_S3_108"^^xsd:string ;
+    ext:userName "User_INJ_S2_108"^^xsd:string ;
     oced:observed_at "2020-01-27"^^xsd:date ;
     oced:observes res:FI_1000_2020_5100000007 .
 
@@ -46463,25 +46463,25 @@ res:Ev_RecordGR_5000000975_2026 a ext:RecordGoodsReceipt,
 
 res:Ev_RecordInv_2020_5105600105 a ext:RecordInvoice,
         oced:Event ;
-    ext:userName "User_INJ_S3_105"^^xsd:string ;
+    ext:userName "User_INJ_S2_105"^^xsd:string ;
     oced:observed_at "2020-01-27"^^xsd:date ;
     oced:observes res:Inv_2020_5105600105 .
 
 res:Ev_RecordInv_2020_5105600106 a ext:RecordInvoice,
         oced:Event ;
-    ext:userName "User_INJ_S3_106"^^xsd:string ;
+    ext:userName "User_INJ_S2_106"^^xsd:string ;
     oced:observed_at "2020-01-27"^^xsd:date ;
     oced:observes res:Inv_2020_5105600106 .
 
 res:Ev_RecordInv_2020_5105600107 a ext:RecordInvoice,
         oced:Event ;
-    ext:userName "User_INJ_S3_107"^^xsd:string ;
+    ext:userName "User_INJ_S2_107"^^xsd:string ;
     oced:observed_at "2020-01-27"^^xsd:date ;
     oced:observes res:Inv_2020_5105600107 .
 
 res:Ev_RecordInv_2020_5105600108 a ext:RecordInvoice,
         oced:Event ;
-    ext:userName "User_INJ_S3_108"^^xsd:string ;
+    ext:userName "User_INJ_S2_108"^^xsd:string ;
     oced:observed_at "2020-01-27"^^xsd:date ;
     oced:observes res:Inv_2020_5105600108 .
 

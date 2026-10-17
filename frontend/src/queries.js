@@ -3,8 +3,8 @@
 //
 // Constraint IDs map directly to the interview protocol and thesis:
 //   B1–B4  Behavioral  — direct OCBC BCM constraints (Van der Aalst et al. 2017)
-//   D4, D6 Data        — attribute comparisons via variable bindings (Küsters 2024)
-//   S1, S3, S5 SoD     — interaction constraints on ext:userName
+//   D1, D2 Data        — attribute comparisons via variable bindings (Küsters 2024)
+//   S1, S2, S3 SoD     — interaction constraints on ext:userName
 //
 // KG path reminders:
 //   PO  --ext:isDeliveredBy-->  GR
@@ -176,16 +176,16 @@ ORDER BY DESC(?amount)`,
   },
 
   // ════════════════════════════════════════════════════════════════
-  // DATA CONSTRAINTS — D4, D6
+  // DATA CONSTRAINTS — D1, D2
   // Attribute comparisons on ClaM objects (variable bindings)
   // ════════════════════════════════════════════════════════════════
 
   {
-    id:    "d4_vendor_mismatch",
+    id:    "d1_vendor_mismatch",
     cat:   "Data",
-    label: "D4 — Vendor on invoice does not match vendor on PO",
+    label: "D1 — Vendor on invoice does not match vendor on PO",
     sev:   "critical",
-    ocbc:  "D4: Data constraint — ext:vendorId mismatch (Three-Way Match vendor check)",
+    ocbc:  "D1: Data constraint — ext:vendorId mismatch (Three-Way Match vendor check)",
     query: `PREFIX ext:  <http://emixa.nl/p2p/domain#>
 PREFIX oced: <https://w3id.org/ocedo/core#>
 
@@ -215,11 +215,11 @@ ORDER BY DESC(?amount)`,
   },
 
   {
-    id:    "d6_amount_tolerance",
+    id:    "d2_amount_tolerance",
     cat:   "Data",
-    label: "D6 — Invoiced amount exceeds PO value beyond tolerance",
+    label: "D2 — Invoiced amount exceeds PO value beyond tolerance",
     sev:   "high",
-    ocbc:  "D6: Data constraint — ext:netAmount deviation (Three-Way Match amount check)",
+    ocbc:  "D2: Data constraint — ext:netAmount deviation (Three-Way Match amount check)",
     query: `PREFIX ext:  <http://emixa.nl/p2p/domain#>
 PREFIX oced: <https://w3id.org/ocedo/core#>
 
@@ -248,7 +248,7 @@ ORDER BY DESC(?deviation)`,
   },
 
   // ════════════════════════════════════════════════════════════════
-  // SEGREGATION OF DUTIES — S1, S3, S5
+  // SEGREGATION OF DUTIES — S1, S2, S3
   // Interaction constraints on ext:userName across event types
   // ════════════════════════════════════════════════════════════════
 
@@ -283,11 +283,11 @@ ORDER BY ?user ?poDate`,
   },
 
   {
-    id:    "s3_invoice_enterer_is_payment_poster",
+    id:    "s2_invoice_enterer_is_payment_poster",
     cat:   "Segregation of Duties",
-    label: "S3 — Invoice enterer also posted the payment",
+    label: "S2 — Invoice enterer also posted the payment",
     sev:   "critical",
-    ocbc:  "S3: SoD — RecordInvoice ≠ ClearInvoice (ext:userName)",
+    ocbc:  "S2: SoD — RecordInvoice ≠ ClearInvoice (ext:userName)",
     query: `PREFIX ext:  <http://emixa.nl/p2p/domain#>
 PREFIX oced: <https://w3id.org/ocedo/core#>
 
@@ -315,11 +315,11 @@ ORDER BY ?user ?invDate`,
   },
 
   {
-    id:    "s5_po_creator_is_gr_poster",
+    id:    "s3_po_creator_is_gr_poster",
     cat:   "Segregation of Duties",
-    label: "S5 — PO creator also posted the Goods Receipt",
+    label: "S3 — PO creator also posted the Goods Receipt",
     sev:   "high",
-    ocbc:  "S5: SoD — CreatePurchaseOrder ≠ RecordGoodsReceipt (ext:userName)",
+    ocbc:  "S3: SoD — CreatePurchaseOrder ≠ RecordGoodsReceipt (ext:userName)",
     query: `PREFIX ext:  <http://emixa.nl/p2p/domain#>
 PREFIX oced: <https://w3id.org/ocedo/core#>
 
