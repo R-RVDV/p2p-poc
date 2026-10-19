@@ -311,7 +311,7 @@ function ConformancePage({ data, setData, loading, setLoading, onJumpToQuery, on
       <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:"24px"}}>
         <div>
           <div style={{fontSize:"16px",fontWeight:700,color:C.text,marginBottom:"3px"}}>Model-Wide Conformance</div>
-          <div style={{fontSize:"11px",color:C.textMid}}>Full OCBC model check across all Purchase Orders — ClaM (object relations) + BCM (event precedence)</div>
+          <div style={{fontSize:"11px",color:C.textMid}}>Full OCBC model check across all Purchase Orders: ClaM (object relations) + BCM (event precedence)</div>
         </div>
         <button onClick={run} disabled={loading} style={{padding:"8px 20px",borderRadius:"7px",border:"none",cursor:loading?"not-allowed":"pointer",background:loading?C.surfaceEl:C.teal,color:loading?"#555":"#09132B",fontSize:"13px",fontWeight:700,minWidth:"120px",flexShrink:0}}>
           {loading ? "Running…" : data ? "↺ Re-run" : "▶ Run Check"}
@@ -329,7 +329,7 @@ function ConformancePage({ data, setData, loading, setLoading, onJumpToQuery, on
 
       {loading && (
         <div style={{textAlign:"center",paddingTop:"80px",color:C.textDim,animation:"pulse 1.4s infinite",fontSize:"12px"}}>
-          Running conformance check — this may take a few seconds…
+          Running conformance check. This may take a few seconds…
         </div>
       )}
 
